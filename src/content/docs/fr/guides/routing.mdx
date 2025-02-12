@@ -190,6 +190,8 @@ const { title, text } = Astro.props;
 ### Mode serveur (SSR)
 En [mode SSR](/fr/guides/on-demand-rendering/), les routes dynamiques sont définies de la même manière : incluez des crochets `[param]` ou `[...path]` dans vos noms de fichiers pour faire correspondre des chaînes ou des chemins arbitraires. Mais comme les routes ne sont plus construites à l'avance, la page sera servie à toute route correspondante. Comme il ne s'agit pas de routes « statiques », `getStaticPaths` ne doit pas être utilisé.
 
+Pour les routes rendues à la demande, un seul paramètre reste utilisant la syntaxe de décomposition peut être utilisé dans le nom de fichier (par exemple `src/pages/[locale]/[...slug].astro` ou `src/pages/[...locale]/[slug].astro`, mais pas `src/pages/[...locale]/[...slug].astro`).
+
 ```astro title="src/pages/resources/[resource]/[id].astro"
 ---
 const { resource, id } = Astro.params;
@@ -248,14 +250,17 @@ Vous pouvez définir des règles pour [rediriger les utilisateurs vers des pages
 
 <p><Since v="2.9.0" /></p>
 
-Vous pouvez spécifier une correspondance de redirections permanentes dans votre configuration Astro avec la valeur `redirects`. Pour la plupart des redirections, il s'agit d'une correspondance entre l'ancienne et la nouvelle route :
+Vous pouvez spécifier une correspondance de redirections permanentes dans votre configuration Astro avec la valeur [`redirects`](/fr/reference/configuration-reference/#redirects).
+
+Pour les redirections internes, il s'agit d'une association entre le chemin d'une ancienne route vers la nouvelle route. Depuis Astro v5.2.0, il est également possible de rediriger vers des URL externes qui commencent par `http` ou `https` et [pouvant être analysées](https://developer.mozilla.org/en-US/docs/Web/API/URL/canParse_static) :
 
 ```js title="astro.config.mjs" {4-6}
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   redirects: {
-    '/ancienne-page': '/nouvelle-page'
+    '/ancienne-page': '/nouvelle-page',
+    '/blog': 'https://example.com/blog'
   }
 });
 ```
@@ -280,6 +285,10 @@ export default defineConfig({
     '/ancienne-page': {
       status: 302,
       destination: '/nouvelle-page'
+    },
+    '/news': {
+      status: 302,
+      destination: 'https://example.com/news'
     }
   }
 });
